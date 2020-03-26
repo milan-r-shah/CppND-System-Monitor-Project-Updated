@@ -97,7 +97,24 @@ float LinuxParser::MemoryUtilization() {
 }
 
 // TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+long LinuxParser::UpTime() {
+  long int upTime = 0;
+  std::string upTimeStr = "";
+  std::string line;
+  std::string firstValue;
+  std::string secondValue;
+  std::ifstream filestream(kProcDirectory + kUptimeFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      while (linestream >> firstValue >> secondValue) {
+        upTimeStr = firstValue;
+      }
+    }
+  }
+  upTime = std::stol(upTimeStr);
+  return upTime;
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
@@ -117,7 +134,6 @@ vector<string> LinuxParser::CpuUtilization() { return {}; }
 
 // TODO: Read and return the total number of processes
 int LinuxParser::TotalProcesses() {
-  // return 0;
   int totalProcesses = 0;
   std::string line;
   std::string key;
@@ -128,20 +144,17 @@ int LinuxParser::TotalProcesses() {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
         if (key == "processes") {
-          // std::cout << value << "\n";
           totalProcesses = std::stoi(value);
           break;
         }
       }
     }
   }
-
   return totalProcesses;
 }
 
 // TODO: Read and return the number of running processes
 int LinuxParser::RunningProcesses() {
-  // return 0;
   int runningProcesses = 0;
   std::string line;
   std::string key;
@@ -152,14 +165,12 @@ int LinuxParser::RunningProcesses() {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
         if (key == "procs_running") {
-          // std::cout << value << "\n";
           runningProcesses = std::stoi(value);
           break;
         }
       }
     }
   }
-
   return runningProcesses;
 }
 
