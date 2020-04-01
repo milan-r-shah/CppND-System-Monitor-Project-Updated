@@ -187,7 +187,6 @@ int LinuxParser::RunningProcesses() {
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Command(int pid [[maybe_unused]]) {
-  std::string cmd;
   std::string line;
 
   std::ifstream filestream(kProcDirectory + std::to_string(pid) +
@@ -195,17 +194,16 @@ string LinuxParser::Command(int pid [[maybe_unused]]) {
 
   if (filestream.is_open()) {
     std::getline(filestream, line);
-    std::istringstream linestream(line);
-    linestream >> cmd;
   }
 
-  return cmd;
+  return line;
 }
 
 // TODO: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Ram(int pid [[maybe_unused]]) {
-  float ram = 0.0;
+  int ram = 0;
+  // float ram = 0.0;
   std::string line;
   std::string key, value;
 
@@ -218,12 +216,13 @@ string LinuxParser::Ram(int pid [[maybe_unused]]) {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
         if (key == "VmSize") {
-          ram = std::stof(value)/1000.0;
+          ram = std::stoi(value) / 1000;
+          // ram = std::stof(value) / 1000.0;
         }
       }
     }
   }
-  
+
   return std::to_string(ram);
 }
 
@@ -274,10 +273,71 @@ string LinuxParser::User(int pid [[maybe_unused]]) {
       }
     }
   }
-  // user = uid_of_pid;
+
   return user;
 }
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid [[maybe_unused]]) { return 0; }
+long LinuxParser::UpTime(int pid [[maybe_unused]]) {
+  long clockTicks = 0;
+  std::string line;
+  std::string key, value;
+
+  std::ifstream filestream(kProcDirectory + std::to_string(pid) +
+                           kStatFilename);
+
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::replace(line.begin(), line.end(), '(', '_');
+      std::replace(line.begin(), line.end(), ')', '_');
+      std::replace(line.begin(), line.end(), '-', '_');
+      std::istringstream linestream(line);
+      std::istream_iterator<std::string> beg(linestream), end;
+      std::vector<std::string> vec(beg, end);
+      clockTicks = std::stol(vec[21]);
+    }
+  }
+
+  return clockTicks / sysconf(_SC_CLK_TCK);
+}
+
+float LinuxParser::ProcessCpuUtil(int pid) {
+  float processCpuUtil = 0.0;
+  long upTime = UpTime();
+
+  std::string line;
+  std::string key, value;
+
+  std::ifstream filestream(kProcDirectory + std::to_string(pid) +
+                           kStatFilename);
+
+  int uTimeClkTks = 0;
+  int sTimeClkTks = 0;
+  int cuTimeClkTks = 0;
+  int csTimeClkTks = 0;
+  float startTimeClkTks = 0.0;
+
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::replace(line.begin(), line.end(), '(', '_');
+      std::replace(line.begin(), line.end(), ')', '_');
+      std::replace(line.begin(), line.end(), '-', '_');
+      std::istringstream linestream(line);
+      std::istream_iterator<std::string> beg(linestream), end;
+      std::vector<std::string> vec(beg, end);
+      uTimeClkTks = std::stoi(vec[13]);
+      sTimeClkTks = std::stoi(vec[14]);
+      cuTimeClkTks = std::stoi(vec[15]);
+      csTimeClkTks = std::stoi(vec[16]);
+      startTimeClkTks = std::stof(vec[21]);
+
+      float totalTime =
+          (float)(uTimeClkTks + sTimeClkTks + cuTimeClkTks + csTimeClkTks);
+      float seconds = upTime - startTimeClkTks / sysconf(_SC_CLK_TCK);
+      processCpuUtil = 100 * ((totalTime / sysconf(_SC_CLK_TCK)) / seconds);
+    }
+  }
+
+  return processCpuUtil;
+}
