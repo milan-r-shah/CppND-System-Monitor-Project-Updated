@@ -18,14 +18,20 @@ using std::string;
 using std::vector;
 
 // TODO: Return the system's CPU
-Processor& System::Cpu() { return cpu_; }
+Processor &System::Cpu() { return cpu_; }
+
+// bool FuncForSorting(Process const &a, Process const &b) { return (a < b); }
 
 // TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() {
+vector<Process> &System::Processes() {
   std::vector<int> pids = LinuxParser::Pids();
-  for (const auto& p : pids) {
+  for (const auto &p : pids) {
     processes_.push_back(Process(p));
   }
+  // std::sort(processes_.begin(), processes_.end(), FuncForSorting);
+  std::sort(processes_.begin(), processes_.end(),
+            [](Process const &a, Process const &b) { return a < b; });
+
   return processes_;
 }
 

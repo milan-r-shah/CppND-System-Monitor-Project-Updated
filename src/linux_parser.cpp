@@ -299,7 +299,7 @@ long LinuxParser::UpTime(int pid) {
     }
   }
 
-  return clockTicks / sysconf(_SC_CLK_TCK);
+  return UpTime() - clockTicks / sysconf(_SC_CLK_TCK);
 }
 
 float LinuxParser::ProcessCpuUtil(int pid) {
@@ -335,7 +335,7 @@ float LinuxParser::ProcessCpuUtil(int pid) {
       float totalTime =
           (float)(uTimeClkTks + sTimeClkTks + cuTimeClkTks + csTimeClkTks);
       float seconds = upTime - startTimeClkTks / sysconf(_SC_CLK_TCK);
-      processCpuUtil = 100 * ((totalTime / sysconf(_SC_CLK_TCK)) / seconds);
+      processCpuUtil = (totalTime / sysconf(_SC_CLK_TCK)) / seconds;
     }
   }
 
