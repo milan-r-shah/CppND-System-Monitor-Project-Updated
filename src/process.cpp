@@ -18,6 +18,11 @@ Process::Process(int pid) : pid_(pid) {}
 // TODO: Return this process's ID
 int Process::Pid() { return pid_; }
 
+int Process::GetPid() const {
+    int tempPid = pid_;
+    return tempPid;
+}
+
 // TODO: Return this process's CPU utilization
 float Process::CpuUtilization() const {
   // return LinuxParser::ProcessCpuUtil(Pid());
@@ -26,7 +31,7 @@ float Process::CpuUtilization() const {
 
   std::string line;
   std::string key, value;
-  int tempPid = Pid();
+  const int tempPid = GetPid();
   std::string tempString = std::to_string(tempPid);
 
 //   std::ifstream filestream(LinuxParser::kProcDirectory + std::to_string(tempPid) +
@@ -79,5 +84,5 @@ long int Process::UpTime() { return LinuxParser::UpTime(Pid()); }
 // TODO: Overload the "less than" comparison operator for Process objects
 // REMOVE: [[maybe_unused]] once you define the function
 bool Process::operator<(Process const& a [[maybe_unused]]) const {
-  return true;
+  return (this->CpuUtilization() < a.CpuUtilization());
 }
