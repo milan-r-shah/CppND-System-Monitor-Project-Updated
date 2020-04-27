@@ -4,7 +4,7 @@ Starter code for System Monitor Project in the Object Oriented Programming Cours
 
 Follow along with the classroom lesson to complete the project!
 
-![System Monitor](images/monitor.png)
+![System Monitor](images/milan_SystemMonitor.png)
 
 ## Udacity Linux Workspace
 [Udacity](https://www.udacity.com/) provides a browser-based Linux [Workspace](https://engineering.udacity.com/creating-a-gpu-enhanced-virtual-desktop-for-udacity-497bdd91a505) for students. 
@@ -39,3 +39,8 @@ This project uses [Make](https://www.gnu.org/software/make/). The Makefile has f
 5. Implement the `System`, `Process`, and `Processor` classes, as well as functions within the `LinuxParser` namespace.
 
 6. Submit!
+
+
+<!--
+System Monitor Project from the Object Oriented Programming Course of the Udacity C++ Nanodegree Program 
+-->
